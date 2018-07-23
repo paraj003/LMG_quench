@@ -1,5 +1,9 @@
+# Module containing all definitions necessary to run a quench for the LMG model. Use python 3.
 import numpy as np
 import os
+import h5py
+
+
 
 # Class definition to define Hamiltonian
 
@@ -60,10 +64,16 @@ def time_evolved_Sz2(InitState,Nsteps,U_dt,N):
         Sz2arr[p]=Sz2(ψ_t,N)
     return Sz2arr
 
-def save_data_Sz2t():
+def save_data_Sz2t(paramvals0:Ham_params,paramvalsf:Ham_params,Sz2arr,initstate,Nsteps,dt):
     # saves data in a h5py dictionary
-    directory='data/Sz2t'
+    directory='data/Sz2t/'
     if not os.path.exists(directory):
         os.makedirs(directory)
+    filename=directory+'Sz2t_[0_'+str(dt)+'_'+str(dt*Nsteps)+']_from_'+paramvals0.paramstr()+'_to_'+paramvalsf.paramstr()+'.hdf5'
+    display(filename)
+    with h5py.File(filename, "w") as f:
+        f.create_dataset("Sz2arr", Sz2arr.shape, dtype=Sz2arr.dtype, data=Sz2arr)
+        f.create_dataset("InitState", initstate.shape, dtype=initstate.dtype, data=initstate)
+        f.close()
     
 
