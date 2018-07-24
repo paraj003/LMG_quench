@@ -59,7 +59,7 @@ def time_evolved_Sz2(InitState,Nsteps,U_dt,N):
     Sz2arr=np.zeros(Nsteps)
     ψ_t=np.copy(InitState)
     for p in np.arange(Nsteps):
-        print(p, end='\r', flush=True)
+        print(p) #print(p, end='\r', flush=True)
         ψ_t=np.dot(U_dt,ψ_t)
         Sz2arr[p]=Sz2(ψ_t,N)
     return Sz2arr
@@ -70,10 +70,12 @@ def save_data_Sz2t(paramvals0:Ham_params,paramvalsf:Ham_params,Sz2arr,initstate,
     if not os.path.exists(directory):
         os.makedirs(directory)
     filename=directory+'Sz2t_[0_'+str(dt)+'_'+str(dt*Nsteps)+']_from_'+paramvals0.paramstr()+'_to_'+paramvalsf.paramstr()+'.hdf5'
-    display(filename)
+    print(filename)
     with h5py.File(filename, "w") as f:
         f.create_dataset("Sz2arr", Sz2arr.shape, dtype=Sz2arr.dtype, data=Sz2arr)
         f.create_dataset("InitState", initstate.shape, dtype=initstate.dtype, data=initstate)
         f.close()
+    with open("list_of_Sz2t.txt", "a") as myfile:
+        myfile.write(filename)
     
 

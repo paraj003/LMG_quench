@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH -t 1:00:00
+#SBATCH -t 5:00:00
 #SBATCH -n 5
 #SBATCH -N 1
 #SBATCH -A physics-hi
@@ -15,6 +15,7 @@ export FFTW_NUM_THREADS=$SLURM_NTASKS
 module unload python
 module load python/3.5.1
 
+
 echo "
 
 import numpy as np
@@ -24,10 +25,10 @@ import os
 import mod_LMG as LMG
 import h5py
 
-Larr=np.linspace(100,1000,10)
-L=Larr[int(os.environ[\"SLURM_ARRAY_TASK_ID\"])]  #Set system size.
+Larr=np.concatenate([np.linspace(100,1000,10),np.linspace(2000,10000,9)],axis=0)
+L=Larr[int(os.environ[\"SLURM_ARRAY_TASK_ID\"])-1]  #Set system size.
 paramvals0=LMG.Ham_params(N=L,S=L/2,J=1,γ=0.1,Γ=4)
-paramvalsf=LMG.Ham_params(N=L,S=L/2,J=1,γ=0.1,Γ=1.02)
+paramvalsf=LMG.Ham_params(N=L,S=L/2,J=1,γ=0.1,Γ=1.01)
 dt=0.2 #time step
 Tf=20 # final time step
 Nsteps=int(Tf/dt) 
