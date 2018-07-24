@@ -17,7 +17,7 @@ class Ham_params:
         self.Γ=Γ #Transverse field
     def paramstr(self):
         #returns a string that contains the parameters of the Hamiltonian
-        return'L_'+str(self.N)+',S_'+str(self.S)+',J_'+str(self.J)+',Γ_'+str(self.Γ)+',γ_'+str(self.γ)
+        return'L_'+str(int(self.N))+',S_'+str(float(self.S))+',J_'+str(float(self.J))+',Γ_'+str(float(self.Γ))+',γ_'+str(float(self.γ))
 
 
 #function definitions
