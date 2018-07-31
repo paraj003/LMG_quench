@@ -1,18 +1,19 @@
 #!/bin/bash
-#SBATCH -t 5:00:00
-#SBATCH -n 5
+#SBATCH -t 15:00:00
+#SBATCH -n 10
 #SBATCH -N 1
 #SBATCH -A physics-hi
 #SBATCH --mail-user=paraj@umd.edu
 #SBATCH --mail-type=END
 #SBATCH --mem-per-cpu=6999
 ##SBATCH --exclusive
-#SBATCH --array=1-2
+#SBATCH --array=1-15
 . ~/.profile
 export MKL_NUM_THREADS=$SLURM_NTASKS
 export FFTW_NUM_THREADS=$SLURM_NTASKS
 
 module unload python
+module unload java
 module load python/3.5.1
 
 
@@ -27,8 +28,8 @@ import h5py
 
 Larr=np.concatenate([np.linspace(100,1000,10),np.linspace(2000,10000,9)],axis=0)
 L=Larr[int(os.environ[\"SLURM_ARRAY_TASK_ID\"])-1]  #Set system size.
-paramvals0=LMG.Ham_params(N=L,S=L/2,J=1,γ=0.1,Γ=4)
-paramvalsf=LMG.Ham_params(N=L,S=L/2,J=1,γ=0.1,Γ=1.01)
+paramvals0=LMG.Ham_params(N=L,S=L/2,J=1,γ=0.1,Γ=1.0)
+paramvalsf=LMG.Ham_params(N=L,S=L/2,J=1,γ=0.8,Γ=1.0)
 dt=0.2 #time step
 Tf=20 # final time step
 Nsteps=int(Tf/dt) 

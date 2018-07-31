@@ -4,7 +4,8 @@ filename=directory1+'Sz2t_[0_'+str(dt)+'_'+str(dt*Nsteps)+']_from_'+paramvals0.p
 if not os.path.exists(filename):
     #Initial state Ground state of the paramagnetic phase
     Ham0=LMG.LMG_generateHam(paramvals0)
-    GSenergy,vec=spla.eigs(Ham0,k=1,which="SR")
+    (Ham0.transpose() == Ham0).all() #check hermitian
+    GSenergy,vec=spla.eigs(Ham0,k=1,which="SR",tol=10**(-8))
     InitState=vec[:,0]
     print("Obtained Initial state.")
     #quench hamiltonian
