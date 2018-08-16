@@ -1,4 +1,5 @@
 # Module containing all definitions necessary to run a quench for the LMG model. Use python 3.
+#v1.0 with new defined Hamiltonian with parameters γz and γy
 import numpy as np
 import os
 import h5py
@@ -9,11 +10,12 @@ import h5py
 
 #define Hamiltonian parameters
 class Ham_params:
-    def __init__(self, N:int,S:float,J:float,γ:float,Γ:float):
+    def __init__(self, N:int,S:float,J:float,γz:float,γy:float,Γ:float):
         self.N=N #number of spins, keep it even
         self.S=S #spin sector
         self.J=J #Ising hopping
-        self.γ=γ #anisotropy factor
+        self.γz=γz #z-direction interaction  
+        self.γy=γy #y direction interaction
         self.Γ=Γ #Transverse field
     def paramstr(self):
         #returns a string that contains the parameters of the Hamiltonian
@@ -78,4 +80,4 @@ def save_data_Sz2t(paramvals0:Ham_params,paramvalsf:Ham_params,Sz2arr,initstate,
     with open("list_of_Sz2t.txt", "a") as myfile:
         myfile.write(filename)
     
-
+#def Sz_2_t_tprime(InitState,Nsteps,U_dt,N):
