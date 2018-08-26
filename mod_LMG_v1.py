@@ -81,7 +81,7 @@ def time_evolved_Sz2(InitState,Nsteps,U_dt,X:Ham_params):
     Sz2arr=np.zeros(Nsteps)
     ψ_t=np.copy(InitState)
     for p in np.arange(Nsteps):
-        print(p) #print(p, end='\r', flush=True)
+        #print(p) #print(p, end='\r', flush=True)
         ψ_t=np.dot(U_dt,ψ_t)
         Sz2arr[p]=Sz2(ψ_t,X)
     return Sz2arr
@@ -91,10 +91,10 @@ def time_evolved_Sϕ2(InitState,Nsteps,U_dt,X:Ham_params,Az:complex,Ay:complex):
     Sϕ2arr=np.zeros(Nsteps)
     ψ_t=np.copy(InitState)
     for p in np.arange(Nsteps):
-        print(p) #print(p, end='\r', flush=True)
+        #print(p) #print(p, end='\r', flush=True)
         ψ_t=np.dot(U_dt,ψ_t)
         Sϕ2arr[p]=Sϕ2(ψ_t,X,Az,Ay)
-    return Sz2arr
+    return Sϕ2arr
 
 def save_data_Sz2t(paramvals0:Ham_params,paramvalsf:Ham_params,Sz2arr,initstate,Nsteps,dt):
     # saves data in a h5py dictionary
@@ -115,7 +115,7 @@ def save_data_Sϕ2t(paramvals0:Ham_params,paramvalsf:Ham_params,Sϕ2arr,Az,Ay,in
     directory='data/Sϕ2t/'
     if not os.path.exists(directory):
         os.makedirs(directory)
-    filename=directory+'Sϕ2t_Az_'+str(Az)+'_Ay_'+str(Ay)+'_[0_'+str(dt)+'_'+str(dt*Nsteps)+']_from_'+paramvals0.paramstr()+'_to_'+paramvalsf.paramstr()+'.hdf5'
+    filename=directory+'Sϕ2t_Az_'+str(float(Az))+'_Ay_'+str(float(Ay))+'_[0_'+str(dt)+'_'+str(dt*Nsteps)+']_from_'+paramvals0.paramstr()+'_to_'+paramvalsf.paramstr()+'.hdf5'
     print(filename)
     with h5py.File(filename, "w") as f:
         f.create_dataset("Sϕ2arr", Sϕ2arr.shape, dtype=Sϕ2arr.dtype, data=Sϕ2arr)
