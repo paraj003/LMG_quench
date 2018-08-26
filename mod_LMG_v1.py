@@ -108,7 +108,7 @@ def save_data_Sz2t(paramvals0:Ham_params,paramvalsf:Ham_params,Sz2arr,initstate,
         f.create_dataset("InitState", initstate.shape, dtype=initstate.dtype, data=initstate)
         f.close()
     with open("list_of_Sz2t.txt", "a") as myfile:
-        myfile.write(filename)
+        myfile.write(filename+ "\n")
  
 def save_data_Sϕ2t(paramvals0:Ham_params,paramvalsf:Ham_params,Sϕ2arr,Az,Ay,initstate,Nsteps,dt):
     # saves data in a h5py dictionary
@@ -122,6 +122,6 @@ def save_data_Sϕ2t(paramvals0:Ham_params,paramvalsf:Ham_params,Sϕ2arr,Az,Ay,in
         f.create_dataset("InitState", initstate.shape, dtype=initstate.dtype, data=initstate)
         f.close()
     with open("list_of_Sϕ2t.txt", "a") as myfile:
-        myfile.write(filename)
+        myfile.write(filename+ "\n")
     
 #def Sz_2_t_tprime(InitState,Nsteps,U_dt,N):
