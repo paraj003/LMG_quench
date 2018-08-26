@@ -5,7 +5,7 @@ if not os.path.exists(filename):
     #Initial state Ground state of the paramagnetic phase
     Ham0=LMG.LMG_generateHam(paramvals0)
     #(Ham0.transpose() == Ham0).all() #check hermitian
-    GSenergy,vec=spla.eigs(Ham0,k=1,which="SR",tol=10**(-8))
+    GSenergy,vec=spla.eigs(Ham0,k=1,which="SR",tol=10**(-6))
     InitState=vec[:,0]
     print("Obtained Initial state.")
     #quench hamiltonian

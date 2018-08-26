@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH -t 1:00:00
+#SBATCH -t 7:00:00
 #SBATCH -n 10
 #SBATCH -N 1
 #SBATCH -A physics-hi
@@ -7,7 +7,7 @@
 #SBATCH --mail-type=END
 #SBATCH --mem-per-cpu=6999
 ##SBATCH --exclusive
-#SBATCH --array=1-1
+#SBATCH --array=1-15
 . ~/.profile
 export MKL_NUM_THREADS=$SLURM_NTASKS
 export FFTW_NUM_THREADS=$SLURM_NTASKS
