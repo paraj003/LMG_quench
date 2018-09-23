@@ -3,7 +3,7 @@
 import numpy as np
 import os
 import h5py
-
+from scipy import linalg as LA
 
 
 # Class definition to define Hamiltonian
@@ -57,12 +57,16 @@ def magnetizationϕ2(state,X:Ham_params,Az:complex,Ay:complex):
     #calculates magnetization squared along 'ϕ'-direction: Sϕ=(Az*Sz+Ay*Sy) (see lyx file for def)
     Marr=np.linspace(-X.S,X.S,int(2*X.S+1))
     A_Marr=np.zeros(np.size(Marr),dtype=complex)
-    A_Marr[0]=(Az*X.S*state[0]-np.sqrt(2*X.S)*state[1]*Ay/(2*1j))
-    A_Marr[-1]=(Az*X.S*state[-1]+np.sqrt(2*X.S)*state[-2]*Ay/(2*1j))
-    for m in range(1,np.size(Marr)-1):
-        A_Marr[m]=(Az*Marr[m]*state[m]+Ay/(2*1j)*(np.sqrt(X.S*(X.S+1)-Marr[m]*(Marr[m]-1))*state[m-1]-np.sqrt(X.S*(X.S+1)-Marr[m]*(Marr[m]+1))*state[m+1]))
-    magsq=4/X.N**2*np.sum(np.square(np.abs(A_Marr)))
-    return magsq 
+    if X.S==0:
+        magsq=0
+        return magsq
+    else: 
+        A_Marr[0]=(Az*X.S*state[0]-np.sqrt(2*X.S)*state[1]*Ay/(2*1j))
+        A_Marr[-1]=(Az*X.S*state[-1]+np.sqrt(2*X.S)*state[-2]*Ay/(2*1j))
+        for m in range(1,np.size(Marr)-1):
+            A_Marr[m]=(Az*Marr[m]*state[m]+Ay/(2*1j)*(np.sqrt(X.S*(X.S+1)-Marr[m]*(Marr[m]-1))*state[m-1]-np.sqrt(X.S*(X.S+1)-Marr[m]*(Marr[m]+1))*state[m+1]))
+        magsq=4/X.N**2*np.sum(np.square(np.abs(A_Marr)))
+        return magsq 
 
 def Sz2(state,X:Ham_params):
     #takes in a column vector denoting wavefunction, and calcuates average Sz squared.
@@ -96,6 +100,31 @@ def time_evolved_Sϕ2(InitState,Nsteps,U_dt,X:Ham_params,Az:complex,Ay:complex):
         Sϕ2arr[p]=Sϕ2(ψ_t,X,Az,Ay)
     return Sϕ2arr
 
+def FinitetempSϕ2(X:Ham_params,β,Az:complex,Ay:complex):
+    Sarr=np.arange(0,X.S+1)
+    expectvalarr=np.zeros(np.shape(Sarr))
+    partitionfunctionarr=np.zeros(np.shape(Sarr))
+    minenergies=np.zeros(np.shape(Sarr))
+    for s in Sarr:
+        paramvalsS=Ham_params(N=X.N,S=s,J=X.J,γz=X.γz,γy=X.γy,Γ=X.Γ)
+        Ham=LMG_generateHam(paramvalsS)
+        energies,eigenvecs=LA.eig(Ham)
+        minenergies[int(s)]=np.min(np.real(energies))
+        Mvals=np.zeros(np.shape(energies))
+        probvals=np.zeros(np.shape(energies))
+        shiftedenergies=np.real(energies)-minenergies[int(s)] #(to shift the zero of the energies)
+        for p in range(np.size(energies)):
+            Mvals[p]=magnetizationϕ2(eigenvecs[:,p],paramvalsS,Az,Ay)
+            probvals[p]=np.exp(-β*shiftedenergies[p])
+        partitionfunctionarr[int(s)]=np.sum(probvals)
+        expectvalarr[int(s)]=np.dot(probvals,Mvals)
+    minenergiesshifted=minenergies-np.min(minenergies)
+    expectvalarrshifted=np.dot(expectvalarr,np.exp(-β*minenergiesshifted))
+    partitionfunctionarrshifted=np.dot(partitionfunctionarr,np.exp(-β*minenergiesshifted))
+    expectval=np.sum(expectvalarr)/np.sum(partitionfunctionarr)
+    return expectval
+
+### saving data
 def save_data_Sz2t(paramvals0:Ham_params,paramvalsf:Ham_params,Sz2arr,initstate,Nsteps,dt):
     # saves data in a h5py dictionary
     directory='data/Sz2t/'
