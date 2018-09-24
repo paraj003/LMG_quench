@@ -100,8 +100,8 @@ def time_evolved_Sϕ2(InitState,Nsteps,U_dt,X:Ham_params,Az:complex,Ay:complex):
         Sϕ2arr[p]=Sϕ2(ψ_t,X,Az,Ay)
     return Sϕ2arr
 
-def FinitetempSϕ2(X:Ham_params,β,Az:complex,Ay:complex):
-    Sarr=np.arange(0,X.S+1)
+def Finitetempmagnetizationϕ2(X:Ham_params,β,Az:complex,Ay:complex):
+    Sarr=np.arange(0,X.N/2+1)
     expectvalarr=np.zeros(np.shape(Sarr))
     partitionfunctionarr=np.zeros(np.shape(Sarr))
     minenergies=np.zeros(np.shape(Sarr))
@@ -121,7 +121,7 @@ def FinitetempSϕ2(X:Ham_params,β,Az:complex,Ay:complex):
     minenergiesshifted=minenergies-np.min(minenergies)
     expectvalarrshifted=np.dot(expectvalarr,np.exp(-β*minenergiesshifted))
     partitionfunctionarrshifted=np.dot(partitionfunctionarr,np.exp(-β*minenergiesshifted))
-    expectval=np.sum(expectvalarr)/np.sum(partitionfunctionarr)
+    expectval=np.sum(expectvalarrshifted)/np.sum(partitionfunctionarrshifted)
     return expectval
 
 ### saving data
