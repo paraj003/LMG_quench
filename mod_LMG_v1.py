@@ -102,14 +102,16 @@ def time_evolved_Sϕ2(InitState,Nsteps,U_dt,X:Ham_params,Az:complex,Ay:complex):
 
 def Finitetempmagnetizationϕ2(X:Ham_params,β,Az:complex,Ay:complex):
     Sarr=np.arange(0,X.N/2+1)
+    #print(Sarr)
     expectvalarr=np.zeros(np.shape(Sarr))
     partitionfunctionarr=np.zeros(np.shape(Sarr))
     minenergies=np.zeros(np.shape(Sarr))
     for s in Sarr:
+        #print(s)
         paramvalsS=Ham_params(N=X.N,S=s,J=X.J,γz=X.γz,γy=X.γy,Γ=X.Γ)
         Ham=LMG_generateHam(paramvalsS)
         energies,eigenvecs=LA.eig(Ham)
-        minenergies[int(s)]=np.min(np.real(energies))
+        #minenergies[int(s)]=np.min(np.real(energies))
         Mvals=np.zeros(np.shape(energies))
         probvals=np.zeros(np.shape(energies))
         shiftedenergies=np.real(energies)-minenergies[int(s)] #(to shift the zero of the energies)
@@ -118,10 +120,16 @@ def Finitetempmagnetizationϕ2(X:Ham_params,β,Az:complex,Ay:complex):
             probvals[p]=np.exp(-β*shiftedenergies[p])
         partitionfunctionarr[int(s)]=np.sum(probvals)
         expectvalarr[int(s)]=np.dot(probvals,Mvals)
+    Ds=np.zeros(np.shape(Sarr))#multiplicities of each spin sector
+    Ds[int(X.N/2)]=1
+    for p in range(int(X.N/2)):
+        Ds[p]=bm(X.N,int(X.N/2)-p)-bm(X.N,int(X.N/2)-p-1)
+    #print(Ds)
     minenergiesshifted=minenergies-np.min(minenergies)
-    expectvalarrshifted=np.dot(expectvalarr,np.exp(-β*minenergiesshifted))
-    partitionfunctionarrshifted=np.dot(partitionfunctionarr,np.exp(-β*minenergiesshifted))
-    expectval=np.sum(expectvalarrshifted)/np.sum(partitionfunctionarrshifted)
+    #print(np.exp(-β*minenergiesshifted)*Ds)
+    expectvalshifted=np.dot((np.exp(-β*minenergiesshifted)*Ds),expectvalarr)
+    partitionfunctionshifted=np.dot((np.exp(-β*minenergiesshifted)*Ds),partitionfunctionarr)
+    expectval=expectvalshifted/partitionfunctionshifted
     return expectval
 
 ### saving data
