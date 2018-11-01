@@ -4,7 +4,7 @@ import numpy as np
 import os
 import h5py
 from scipy import linalg as LA
-
+from scipy.special import binom as bm
 
 # Class definition to define Hamiltonian
 
