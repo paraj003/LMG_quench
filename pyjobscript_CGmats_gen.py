@@ -32,7 +32,7 @@ LA=LAarr[int(os.environ[\"SLURM_ARRAY_TASK_ID\"])-1]  #Set system size.
 S=L/2
 SA=LA/2
 SB=S-SA
-LMG.CGmatrix(SA,SB,S)
+LMG.CGmatrix_to_file(SA,SB,S)
  ">>CGmatscript-$SLURM_JOB_ID.py
 
 
