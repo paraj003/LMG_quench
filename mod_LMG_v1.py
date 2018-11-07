@@ -5,6 +5,7 @@ import os
 import h5py
 from scipy import linalg as LA
 from scipy.special import binom as bm
+from sympy.physics.quantum.cg import CG
 
 # Class definition to define Hamiltonian
 
@@ -131,8 +132,63 @@ def Finitetempmagnetizationϕ2(X:Ham_params,β,Az:complex,Ay:complex):
     partitionfunctionshifted=np.dot((np.exp(-β*minenergiesshifted)*Ds),partitionfunctionarr)
     expectval=expectvalshifted/partitionfunctionshifted
     return expectval
+###########ENTANGLEMENT ENTROPY##########################
+def CGmatrix(SA,SB,S):
+    #Define a ClebschGordan matrix using sympy library, returns [(2SA+1)(2SB+1)]X[(2S+1)]  matrix that changes for |S,M> basis to |SA,MA;SB,MB>
+    directory='data/CGmats/'
+    filename=directory+'CGmat_SA_'+str(float(SA))+'_SB_'+str(float(SB))+'_S_'+str(float(S))+'.hdf5'
+    if (not os.path.exists(filename)) :
+        print("Running CGmatrix_to_file")
+        CGmatrix_to_file(SA,SB,S)
+    print("Loading CGmatrix: "+filename)
+    with h5py.File(filename, "r") as f:
+        cgmat_data= f["cgmat_data"][...]
+    print(np.shape(cgmat_data))
+    cgmat=np.zeros((int((2*SA+1)*(2*SB+1)),int(2*S+1)))
+    for p in range(np.size(cgmat_data,0)):
+        cgmat[int(cgmat_data[p,1]),int(cgmat_data[p,0])]=cgmat_data[p,2]
+    return cgmat  
+def CGmatrix_to_file(SA,SB,S):
+    #Define a ClebschGordan matrix using sympy library, returns  an array of tuples, (p,q,CG(SA,MA[q],SB,MB[q],S,M[p])) 
+    #which can be converted into the desired matrix  matrix that changes for |S,M> basis to |SA,MA;SB,MB>
+    if S > SA+SB:
+        raise Exception('S should be less than SA+SB')
+    directory='data/CGmats/'
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    filename=directory+'CGmat_SA_'+str(float(SA))+'_SB_'+str(float(SB))+'_S_'+str(float(S))+'.hdf5'
+    if not os.path.exists(filename):   
+        cgmat_data=[]
+        MAarr=np.matlib.repmat(np.linspace(-SA,SA,int(2*SA+1)),1,int(2*SB+1))[0,:]
+        MBarr=np.reshape(np.matlib.repmat(np.linspace(-SB,SB,int(2*SB+1)),int(2*SA+1),1),(1,int((2*SA+1)*(2*SB+1))),order='F')[0,:]
+        Marr=np.linspace(-S,S,int(2*S+1))
+        for p in range(np.size(Marr)):
+            Msumlist=np.where(MAarr+MBarr==Marr[p])[0]
+            #print(p, end='\r', flush=True)
+            for q in Msumlist:
+                    cgmat_data.append([p,q,CG(SA,MAarr[q],SB,MBarr[q],S,Marr[p]).doit().evalf()])
+        cgmat_datanp=np.array([cgmat_data_i for cgmat_data_i in cgmat_data])
+        cgmat_datanpf=cgmat_datanp.astype(float)
+        print("Saving to file: "+filename) 
+        with h5py.File(filename, "w") as f:
+            f.create_dataset("cgmat_data", cgmat_datanpf.shape, dtype=cgmat_datanpf.dtype, data=cgmat_datanpf)   
+        
+def Reduced_ρ(GStateAB,SA,SB):
+    #takes in state written in basis of subsystems A and B and traces out B
+    GStateAB_matrix=np.reshape(GStateAB,(int(2*SB+1),int(2*SA+1)))
+    ρA=np.zeros((int(2*SA+1),int(2*SA+1)),dtype=complex)
+    for p in range(int(2*SA+1)):
+        for q in range(int(2*SA+1)):
+            ρA[p,q]=np.dot(GStateAB_matrix[:,p],np.conjugate(GStateAB_matrix[:,q]))
+    return ρA
+def EEntropy_VN(ρA):
+    ρeigvals=LA.eigvals(ρA)
+    return np.real(-np.dot(ρeigvals,np.log(ρeigvals)))
 
-### saving data
+
+
+
+###############saving data###############################
 def save_data_Sz2t(paramvals0:Ham_params,paramvalsf:Ham_params,Sz2arr,initstate,Nsteps,dt):
     # saves data in a h5py dictionary
     directory='data/Sz2t/'
