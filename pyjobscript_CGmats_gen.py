@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH -t 8:00:00
+#SBATCH -t 48:00:00
 #SBATCH -n 4
 #SBATCH -N 1
 #SBATCH -A physics-hi
