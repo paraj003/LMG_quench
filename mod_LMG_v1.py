@@ -144,7 +144,7 @@ def CGmatrix(SA,SB,S):
     print("Loading CGmatrix: "+filename)
     with h5py.File(filename, "r") as f:
         cgmat_data= f["cgmat_data"][...]
-    print(np.shape(cgmat_data))
+    #print(np.shape(cgmat_data))
     cgmat=np.zeros((int((2*SA+1)*(2*SB+1)),int(2*S+1)))
     for p in range(np.size(cgmat_data,0)):
         cgmat[int(cgmat_data[p,1]),int(cgmat_data[p,0])]=cgmat_data[p,2]
