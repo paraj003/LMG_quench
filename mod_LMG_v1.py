@@ -6,6 +6,7 @@ import h5py
 from scipy import linalg as LA
 from scipy.special import binom as bm
 from sympy.physics.quantum.cg import CG
+import numpy.matlib
 
 # Class definition to define Hamiltonian
 
