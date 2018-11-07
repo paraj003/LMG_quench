@@ -141,7 +141,7 @@ def CGmatrix(SA,SB,S):
     if (not os.path.exists(filename)) :
         print("Running CGmatrix_to_file")
         CGmatrix_to_file(SA,SB,S)
-    print("Loading CGmatrix: "+filename)
+    #print("Loading CGmatrix: "+filename)
     with h5py.File(filename, "r") as f:
         cgmat_data= f["cgmat_data"][...]
     #print(np.shape(cgmat_data))
