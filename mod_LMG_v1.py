@@ -134,13 +134,13 @@ def Finitetempmagnetizationϕ2(X:Ham_params,β,Az:complex,Ay:complex):
     expectval=expectvalshifted/partitionfunctionshifted
     return expectval
 ###########ENTANGLEMENT ENTROPY##########################
-def CGmatrix(SA,SB,S):
+def CGmatrix(SA,SB,S,directory):
     #Define a ClebschGordan matrix using sympy library, returns [(2SA+1)(2SB+1)]X[(2S+1)]  matrix that changes for |S,M> basis to |SA,MA;SB,MB>
-    directory='data/CGmats/'
+    #directory='data/CGmats/'
     filename=directory+'CGmat_SA_'+str(float(SA))+'_SB_'+str(float(SB))+'_S_'+str(float(S))+'.hdf5'
     if (not os.path.exists(filename)) :
         print("Running CGmatrix_to_file")
-        CGmatrix_to_file(SA,SB,S)
+        CGmatrix_to_file(SA,SB,S,directory)
     #print("Loading CGmatrix: "+filename)
     with h5py.File(filename, "r") as f:
         cgmat_data= f["cgmat_data"][...]
@@ -149,12 +149,12 @@ def CGmatrix(SA,SB,S):
     for p in range(np.size(cgmat_data,0)):
         cgmat[int(cgmat_data[p,1]),int(cgmat_data[p,0])]=cgmat_data[p,2]
     return cgmat  
-def CGmatrix_to_file(SA,SB,S):
+def CGmatrix_to_file(SA,SB,S,directory):
     #Define a ClebschGordan matrix using sympy library, returns  an array of tuples, (p,q,CG(SA,MA[q],SB,MB[q],S,M[p])) 
     #which can be converted into the desired matrix  matrix that changes for |S,M> basis to |SA,MA;SB,MB>
     if S > SA+SB:
         raise Exception('S should be less than SA+SB')
-    directory='data/CGmats/'
+    #directory='data/CGmats/'
     if not os.path.exists(directory):
         os.makedirs(directory)
     filename=directory+'CGmat_SA_'+str(float(SA))+'_SB_'+str(float(SB))+'_S_'+str(float(S))+'.hdf5'
@@ -186,7 +186,95 @@ def EEntropy_VN(ρA):
     ρeigvals=LA.eigvals(ρA)
     return np.real(-np.dot(ρeigvals,np.log(ρeigvals)))
 
+################Two-time correlation#####################
+def LMG_Ut(t,energies,eigenvecs):
+    #given row vector of energies, and matrix of eigenvectors of Hamiltonian, it returns the unitary at a particular time
+    return np.dot(np.dot(eigenvecs,LA.expm(-1j*np.diag(energies)*t)),np.transpose(np.conjugate(eigenvecs)))
 
+
+def Sϕ_on_state(X:Ham_params,state,Az:complex,Ay:complex):
+    #returns a vector : Sϕ|Ψ>. See lyx file for derivation
+    Marr=np.linspace(-X.S,X.S,int(2*X.S+1))
+    B_Marr=np.zeros(np.size(Marr),dtype=complex)
+    if X.S==0:
+        return B_Marr
+    else:
+        B_Marr[0]=(Az*X.S*state[0]-np.sqrt(2*X.S)*state[1]*Ay/(2*1j))
+        B_Marr[-1]=(Az*X.S*state[-1]+np.sqrt(2*X.S)*state[-2]*Ay/(2*1j))
+        for m in range(1,np.size(Marr)-1):
+            B_Marr[m]=(Az*Marr[m]*state[m]+Ay/(2*1j)*(np.sqrt(X.S*(X.S+1)-Marr[m]*(Marr[m]-1))*state[m-1]-np.sqrt(X.S*(X.S+1)-Marr[m]*(Marr[m]+1))*state[m+1]))
+        return B_Marr
+
+
+def Sϕt_on_state(X:Ham_params,state,U_t,Az:complex,Ay:complex):
+    #returns a vector : Sϕ(t)|Ψ>=Udag*Sϕ*U|Ψ>
+    return np.dot(np.transpose(np.conjugate(U_t)),Sϕ_on_state(X,np.dot(U_t,state),Az,Ay))
+
+
+def twotimecorrelation(X:Ham_params,t1arr,t2arr,state,energies,eigenvecs,Az:complex,Ay:complex):
+    #Calculate <Sϕ(t2)Sϕ(t1)> for different values of t1 and t2 and return an array
+    #construct unitary at time tt.
+    correlationarr=np.zeros((np.size(t1arr),np.size(t2arr)),dtype=complex)
+    for t1,q in zip(t1arr,range(np.size(t1arr))):
+          for t2,r in zip(t2arr,range(np.size(t2arr))):
+                U_t1=LMG_Ut(t1,energies,eigenvecs)
+                U_t2=LMG_Ut(t2,energies,eigenvecs)
+                Sϕt1=Sϕt_on_state(X,state,U_t1,Az,Ay)
+                Sϕt2=Sϕt_on_state(X,state,U_t2,Az,Ay)
+                correlationarr[q,r]=np.dot(np.transpose(np.conjugate(Sϕt2)),Sϕt1)
+    return correlationarr
+
+def twotimecommutator(X:Ham_params,t1:float,t2:float,state,energies,eigenvecs,Az:complex,Ay:complex):
+    #Returns an array :element 0 =<Sϕ(t2)Sϕ(t1)-Sϕ(t1)Sϕ(t2)>
+    #                  element 1= <Sϕ(t2)Sϕ(t1)+Sϕ(t1)Sϕ(t2)>
+    #construct unitary at time tt.
+    U_t1=LMG_Ut(t1,energies,eigenvecs)
+    U_t2=LMG_Ut(t2,energies,eigenvecs)
+    Sϕt1=Sϕt_on_state(X,state,U_t1,Az,Ay)
+    Sϕt2=Sϕt_on_state(X,state,U_t2,Az,Ay)
+    commutatorarr=np.zeros(2,1,dtype=complex)
+    commutatorarr[0]=np.dot(np.transpose(np.conjugate(Sϕt2)),Sϕt1)-np.dot(np.transpose(np.conjugate(Sϕt1)),Sϕt2)
+    commutatorarr[1]=np.dot(np.transpose(np.conjugate(Sϕt2)),Sϕt1)+np.dot(np.transpose(np.conjugate(Sϕt1)),Sϕt2)
+    return commutatorarr
+
+
+def finitetemp_twotimecorrelation(X:Ham_params,t1arr,t2arr,β:float,Az:complex,Ay:complex):
+    #obtain the finitetemperature correlator <Sϕ(t2)Sϕ(t1)>_β
+    Sarr=np.arange(0,X.N/2+1)
+    expectvalSarr=np.zeros((np.size(t1arr),np.size(t2arr),np.size(Sarr)),dtype=complex)
+    expectvalshifted=np.zeros((np.size(t1arr),np.size(t2arr)),dtype=complex)
+    partitionfunctionarr=np.zeros(np.shape(Sarr))
+    minenergies=np.zeros(np.shape(Sarr))
+    for s in Sarr:
+        #print(s)
+        paramvalsS=Ham_params(N=X.N,S=s,J=X.J,γz=X.γz,γy=X.γy,Γ=X.Γ)
+        Ham=LMG_generateHam(paramvalsS)
+        energies,eigenvecs=LA.eig(Ham)
+        #minenergies[int(s)]=np.min(np.real(energies))
+        correlationvals=np.zeros((np.size(t1arr),np.size(t2arr),np.size(energies)),dtype=complex)
+        probvals=np.zeros(np.shape(energies))
+        shiftedenergies=np.real(energies)-minenergies[int(s)] #(to shift the zero of the energies)
+        for p in range(np.size(energies)):
+            correlationvals[:,:,p]=twotimecorrelation(paramvalsS,t1arr,t2arr,eigenvecs[:,p],energies,eigenvecs,Az,Ay)
+            probvals[p]=np.exp(-β*shiftedenergies[p])
+        partitionfunctionarr[int(s)]=np.sum(probvals)
+        for t1,q in zip(t1arr,range(np.size(t1arr))):
+            for t2,r in zip(t2arr,range(np.size(t2arr))):
+                expectvalSarr[q,r,int(s)]=np.dot(probvals,correlationvals[q,r,:])
+    Ds=np.zeros(np.shape(Sarr))#multiplicities of each spin sector
+    Ds[int(X.N/2)]=1
+    for p in range(int(X.N/2)):
+        Ds[p]=bm(X.N,int(X.N/2)-p)-bm(X.N,int(X.N/2)-p-1)
+    #print(Ds)
+    minenergiesshifted=minenergies-np.min(minenergies)
+    #print(np.exp(-β*minenergiesshifted)*Ds)
+    partitionfunctionshifted=np.dot((np.exp(-β*minenergiesshifted)*Ds),partitionfunctionarr)
+    for t1,q in zip(t1arr,range(np.size(t1arr))):
+            for t2,r in zip(t2arr,range(np.size(t2arr))):
+                expectvalshifted[q,r]=np.dot((np.exp(-β*minenergiesshifted)*Ds),expectvalSarr[q,r,:])
+    expectvalarr=expectvalshifted/partitionfunctionshifted
+    return expectvalarr
+    
 
 
 ###############saving data###############################
@@ -217,5 +305,34 @@ def save_data_Sϕ2t(paramvals0:Ham_params,paramvalsf:Ham_params,Sϕ2arr,Az,Ay,in
         f.close()
     with open("list_of_Sϕ2t.txt", "a") as myfile:
         myfile.write(filename+ "\n")
-    
-#def Sz_2_t_tprime(InitState,Nsteps,U_dt,N):
+
+def save_data_twotimecorrelation(paramvals0:Ham_params,paramvalsf:Ham_params,correlationarr,t1arr,t2arr,Az,Ay):
+    # saves data in a h5py dictionary
+    directory='data/Twotimecorrelation/'
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    filename=directory+'Twotimecorrelator_Az_'+str(float(Az))+'_Ay_'+str(float(Ay))+'_t1_['+str(t1arr[0])+'_'+str(t1arr[-1])+']_t1steps_'+str(np.size(t1arr))+'_t2_['+str(t2arr[0])+'_'+str(t2arr[-1])+']_t2steps_'+str(np.size(t2arr))+'_from_'+paramvals0.paramstr()+'_to_'+paramvalsf.paramstr()+'.hdf5'
+    print(filename)
+    with h5py.File(filename, "w") as f:
+        f.create_dataset("correlationarr", correlationarr.shape, dtype=correlationarr.dtype, data=correlationarr)
+        f.create_dataset("t1arr", t1arr.shape, dtype=t1arr.dtype, data=t1arr)
+        f.create_dataset("t2arr", t2arr.shape, dtype=t2arr.dtype, data=t2arr)
+        f.close()
+    with open("list_of_twotimecorrelators.txt", "a") as myfile:
+        myfile.write(filename+ "\n")
+
+def save_data_EE(paramvals0:Ham_params,paramvalsf:Ham_params,entropyarr,tarr,initstate):
+    # saves data in a h5py dictionary
+    directory='data/EE/'
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    filename=directory+'Entanglement_Entropy_t1_['+str(tarr[0])+'_'+str(t1arr[-1])+']_t1steps_'+str(np.size(t1arr))+'_from_'+paramvals0.paramstr()+'_to_'+paramvalsf.paramstr()+'.hdf5'
+    print(filename)
+    with h5py.File(filename, "w") as f:
+        f.create_dataset("entropyarr", entropyarr.shape, dtype=entropyarr.dtype, data=entropyarr)
+        f.create_dataset("tarr", tarr.shape, dtype=tarr.dtype, data=tarr)
+        f.create_dataset("InitState", initstate.shape, dtype=initstate.dtype, data=initstate)
+        f.close()
+    with open("list_of_entropy.txt", "a") as myfile:
+        myfile.write(filename+ "\n")
+Sz_2_t_tprime(InitState,Nsteps,U_dt,N):
