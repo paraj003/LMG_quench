@@ -102,6 +102,13 @@ def time_evolved_Sϕ2(InitState,Nsteps,U_dt,X:Ham_params,Az:complex,Ay:complex):
         Sϕ2arr[p]=Sϕ2(ψ_t,X,Az,Ay)
     return Sϕ2arr
 
+def time_evolved_Sϕ2_exact(InitState,tarr,energies,eigenvecs,X:Ham_params,Az:complex,Ay:complex):
+    #returns an array with the Sphi^2 calculated at times in tarr by computing exact unitary.
+    Sϕ2arr=np.zeros(np.size(tarr))
+    for t1,q in zip(tarr,range(np.size(tarr))):
+        Sϕ2arr[q]=np.real(twotimecorrelation(X,[t1],[t1],InitState,energies,eigenvecs,Az,Ay)[0,0])
+    return Sϕ2arr
+
 def Finitetempmagnetizationϕ2(X:Ham_params,β,Az:complex,Ay:complex):
     Sarr=np.arange(0,X.N/2+1)
     #print(Sarr)
@@ -311,7 +318,7 @@ def save_data_twotimecorrelation(paramvals0:Ham_params,paramvalsf:Ham_params,cor
     directory='data/Twotimecorrelation/'
     if not os.path.exists(directory):
         os.makedirs(directory)
-    filename=directory+'Twotimecorrelator_Az_'+str(float(Az))+'_Ay_'+str(float(Ay))+'_t1_['+str(t1arr[0])+'_'+str(t1arr[-1])+']_t1steps_'+str(np.size(t1arr))+'_t2_['+str(t2arr[0])+'_'+str(t2arr[-1])+']_t2steps_'+str(np.size(t2arr))+'_from_'+paramvals0.paramstr()+'_to_'+paramvalsf.paramstr()+'.hdf5'
+    filename=directory+'Twotimecorrelator_Az_'+str(float(Az))+'_Ay_'+str(float(Ay))+'_t1_['+str(t1arr[0])+'_'+str((t1arr[-1]-t1arr[0])/np.size(t1arr))+'_'+str(t1arr[-1])+']_t2_['+str(t2arr[0])+'_'+str((t2arr[-1]-t2arr[0])/np.size(t2arr))+'_'+str(t2arr[-1])+']_from_'+paramvals0.paramstr()+'_to_'+paramvalsf.paramstr()+'.hdf5'
     print(filename)
     with h5py.File(filename, "w") as f:
         f.create_dataset("correlationarr", correlationarr.shape, dtype=correlationarr.dtype, data=correlationarr)
@@ -335,4 +342,4 @@ def save_data_EE(paramvals0:Ham_params,paramvalsf:Ham_params,entropyarr,tarr,ini
         f.close()
     with open("list_of_entropy.txt", "a") as myfile:
         myfile.write(filename+ "\n")
-Sz_2_t_tprime(InitState,Nsteps,U_dt,N):
+
