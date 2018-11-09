@@ -11,12 +11,13 @@ if not os.path.exists(filename1) or not os.path.exists(filename2):
     print("Obtained Initial state.")
     #quench hamiltonian
     Hamf=LMG.LMG_generateHam(paramvalsf)
-    U_dt=LA.expm(-1j*Hamf*dt)
+    energyf,vecf=LA.eig(Hamf)
+    #U_dt=LA.expm(-1j*Hamf*dt)
     #time-evolved magnetization squared
     Sz2arr=np.zeros(Nsteps)
     Sy2arr=np.zeros(Nsteps)
-    Sz2arr=LMG.time_evolved_Sϕ2(InitState,Nsteps,U_dt,paramvalsf,1.,0.)
-    Sy2arr=LMG.time_evolved_Sϕ2(InitState,Nsteps,U_dt,paramvalsf,0.,1.)
+    Sz2arr=LMG.time_evolved_Sϕ2_exact(InitState,tarr,energyf,vecf,paramvals0,1.,0.)#LMG.time_evolved_Sϕ2(InitState,Nsteps,U_dt,paramvalsf,1.,0.)
+    Sy2arr=LMG.time_evolved_Sϕ2_exact(InitState,tarr,energyf,vecf,paramvals0,0.,1.)#LMG.time_evolved_Sϕ2(InitState,Nsteps,U_dt,paramvalsf,0.,1.)
     LMG.save_data_Sϕ2t(paramvals0,paramvalsf,Sz2arr,1.,0.,InitState,Nsteps,dt)
     LMG.save_data_Sϕ2t(paramvals0,paramvalsf,Sy2arr,0.,1.,InitState,Nsteps,dt)
 
