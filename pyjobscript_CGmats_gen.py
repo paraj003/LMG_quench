@@ -28,9 +28,9 @@ import h5py
 
 L=600
 LAarr=np.concatenate([np.linspace(10,100,10),np.linspace(150,300,4)],axis=0)#np.concatenate([np.linspace(10,100,10),np.linspace(200,1000,9)],axis=0)
-LA=LAarr[int(os.environ[\"SLURM_ARRAY_TASK_ID\"])-1]  #Set system size.
+La=LAarr[int(os.environ[\"SLURM_ARRAY_TASK_ID\"])-1]  #Set system size.
 S=L/2
-SA=LA/2
+SA=La/2
 SB=S-SA
 directory='data/CGmats'
 LMG.CGmatrix_to_file(SA,SB,S,directory)
