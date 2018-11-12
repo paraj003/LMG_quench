@@ -12,13 +12,11 @@ if not os.path.exists(filename1) or not os.path.exists(filename2):
     #quench hamiltonian
     Hamf=LMG.LMG_generateHam(paramvalsf)
     energyf,vecf=LA.eig(Hamf)
-    #twotime correlator
-    U_t1=LMG.LMG_Ut(1.2,energyf,vecf)
-    testmat=LMG.Sϕ_on_state(paramvals0,np.dot(U_t1,vec),1,0)
-    #correlationmatz=LMG.twotimecorrelation(paramvals0,t1arr,t2arr,vec,energyf,vecf,1,0)
-    #LMG.save_data_twotimecorrelation(paramvals0,paramvalsf,correlationmatz,t1arr,t2arr,1,0)
-    #correlationmaty=LMG.twotimecorrelation(paramvals0,t1arr,t2arr,vec,energyf,vecf,0,1)
-    #LMG.save_data_twotimecorrelation(paramvals0,paramvalsf,correlationmaty,t1arr,t2arr,0,1)
+    #twotime correlator    
+    correlationmatz=LMG.twotimecorrelation(paramvals0,t1arr,t2arr,InitState,energyf,vecf,1,0)
+    LMG.save_data_twotimecorrelation(paramvals0,paramvalsf,correlationmatz,t1arr,t2arr,1,0)
+    correlationmaty=LMG.twotimecorrelation(paramvals0,t1arr,t2arr,InitState,energyf,vecf,0,1)
+    LMG.save_data_twotimecorrelation(paramvals0,paramvalsf,correlationmaty,t1arr,t2arr,0,1)
 else:
     print("Simulation unnecessary. File:\n"+filename1+"\n"+filename2)
 

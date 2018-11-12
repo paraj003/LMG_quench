@@ -58,7 +58,7 @@ def magnetizationz2(state,X:Ham_params):
 def magnetizationϕ2(state,X:Ham_params,Az:complex,Ay:complex):
     #calculates magnetization squared along 'ϕ'-direction: Sϕ=(Az*Sz+Ay*Sy) (see lyx file for def)
     Marr=np.linspace(-X.S,X.S,int(2*X.S+1))
-    A_Marr=np.zeros(np.size(Marr),dtype=complex128)
+    A_Marr=np.zeros(np.size(Marr),dtype=complex)
     if X.S==0:
         magsq=0
         return magsq
@@ -184,7 +184,7 @@ def CGmatrix_to_file(SA,SB,S,directory):
 def Reduced_ρ(GStateAB,SA,SB):
     #takes in state written in basis of subsystems A and B and traces out B
     GStateAB_matrix=np.reshape(GStateAB,(int(2*SB+1),int(2*SA+1)))
-    ρA=np.zeros((int(2*SA+1),int(2*SA+1)),dtype=complex128)
+    ρA=np.zeros((int(2*SA+1),int(2*SA+1)),dtype=complex)
     for p in range(int(2*SA+1)):
         for q in range(int(2*SA+1)):
             ρA[p,q]=np.dot(GStateAB_matrix[:,p],np.conjugate(GStateAB_matrix[:,q]))
@@ -202,8 +202,7 @@ def LMG_Ut(t,energies,eigenvecs):
 def Sϕ_on_state(X:Ham_params,state,Az:complex,Ay:complex):
     #returns a vector : Sϕ|Ψ>. See lyx file for derivation
     Marr=np.linspace(-X.S,X.S,int(2*X.S+1))
-    B_Marr=np.zeros(np.size(Marr),dtype=complex128)
-    print(B_Marr[0])
+    B_Marr=np.zeros(np.size(Marr),dtype=complex)
     if X.S==0:
         return B_Marr
     else:
@@ -222,7 +221,7 @@ def Sϕt_on_state(X:Ham_params,state,U_t,Az:complex,Ay:complex):
 def twotimecorrelation(X:Ham_params,t1arr,t2arr,state,energies,eigenvecs,Az:complex,Ay:complex):
     #Calculate <Sϕ(t2)Sϕ(t1)> for different values of t1 and t2 and return an array
     #construct unitary at time tt.
-    correlationarr=np.zeros((np.size(t1arr),np.size(t2arr)),dtype=complex128)
+    correlationarr=np.zeros((np.size(t1arr),np.size(t2arr)),dtype=complex)
     for t1,q in zip(t1arr,range(np.size(t1arr))):
           for t2,r in zip(t2arr,range(np.size(t2arr))):
                 U_t1=LMG_Ut(t1,energies,eigenvecs)
@@ -240,7 +239,7 @@ def twotimecommutator(X:Ham_params,t1:float,t2:float,state,energies,eigenvecs,Az
     U_t2=LMG_Ut(t2,energies,eigenvecs)
     Sϕt1=Sϕt_on_state(X,state,U_t1,Az,Ay)
     Sϕt2=Sϕt_on_state(X,state,U_t2,Az,Ay)
-    commutatorarr=np.zeros(2,1,dtype=complex128)
+    commutatorarr=np.zeros(2,1,dtype=complex)
     commutatorarr[0]=np.dot(np.transpose(np.conjugate(Sϕt2)),Sϕt1)-np.dot(np.transpose(np.conjugate(Sϕt1)),Sϕt2)
     commutatorarr[1]=np.dot(np.transpose(np.conjugate(Sϕt2)),Sϕt1)+np.dot(np.transpose(np.conjugate(Sϕt1)),Sϕt2)
     return commutatorarr
@@ -249,8 +248,8 @@ def twotimecommutator(X:Ham_params,t1:float,t2:float,state,energies,eigenvecs,Az
 def finitetemp_twotimecorrelation(X:Ham_params,t1arr,t2arr,β:float,Az:complex,Ay:complex):
     #obtain the finitetemperature correlator <Sϕ(t2)Sϕ(t1)>_β
     Sarr=np.arange(0,X.N/2+1)
-    expectvalSarr=np.zeros((np.size(t1arr),np.size(t2arr),np.size(Sarr)),dtype=complex128)
-    expectvalshifted=np.zeros((np.size(t1arr),np.size(t2arr)),dtype=complex128)
+    expectvalSarr=np.zeros((np.size(t1arr),np.size(t2arr),np.size(Sarr)),dtype=complex)
+    expectvalshifted=np.zeros((np.size(t1arr),np.size(t2arr)),dtype=complex)
     partitionfunctionarr=np.zeros(np.shape(Sarr))
     minenergies=np.zeros(np.shape(Sarr))
     for s in Sarr:
@@ -259,7 +258,7 @@ def finitetemp_twotimecorrelation(X:Ham_params,t1arr,t2arr,β:float,Az:complex,A
         Ham=LMG_generateHam(paramvalsS)
         energies,eigenvecs=LA.eig(Ham)
         #minenergies[int(s)]=np.min(np.real(energies))
-        correlationvals=np.zeros((np.size(t1arr),np.size(t2arr),np.size(energies)),dtype=complex128)
+        correlationvals=np.zeros((np.size(t1arr),np.size(t2arr),np.size(energies)),dtype=complex)
         probvals=np.zeros(np.shape(energies))
         shiftedenergies=np.real(energies)-minenergies[int(s)] #(to shift the zero of the energies)
         for p in range(np.size(energies)):
