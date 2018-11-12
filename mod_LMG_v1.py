@@ -336,7 +336,7 @@ def save_data_EE(paramvals0:Ham_params,paramvalsf:Ham_params,entropyarr,tarr,ini
     directory='data/EE/'
     if not os.path.exists(directory):
         os.makedirs(directory)
-    filename=directory+'EE_SA_'+arrtostr(part_szarr)+'_t_'+arrtostr(tarr)+'_from_'+paramvals0.paramstr()+'_to_'+paramvalsf.paramstr()+'.hdf5'
+    filename=directory+'EE_LA_'+arrtostr(part_szarr)+'_t_'+arrtostr(tarr)+'_from_'+paramvals0.paramstr()+'_to_'+paramvalsf.paramstr()+'.hdf5'
     print(filename)
     with h5py.File(filename, "w") as f:
         f.create_dataset("entropyarr", entropyarr.shape, dtype=entropyarr.dtype, data=entropyarr)
