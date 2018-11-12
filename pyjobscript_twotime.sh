@@ -1,5 +1,6 @@
 #!/bin/bash
-#SBATCH -t 7:00:00
+#SBATCH -p debug
+#SBATCH -t 15:00
 #SBATCH -n 10
 #SBATCH -N 1
 #SBATCH -A physics-hi
