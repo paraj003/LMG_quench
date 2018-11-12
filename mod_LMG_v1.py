@@ -285,6 +285,9 @@ def finitetemp_twotimecorrelation(X:Ham_params,t1arr,t2arr,β:float,Az:complex,A
 
 
 ###############saving data###############################
+def timearrstr(tarr):
+    #returns a string with the time array
+    return '['+str(tarr[0])+'_'+str(np.divide((tarr[-1]-tarr[0]),(np.size(tarr)-1),out=np.zeros_like((tarr[-1]-tarr[0])), where=np.size(tarr)!=1))+'_'+str(tarr[-1])+']'
 def save_data_Sz2t(paramvals0:Ham_params,paramvalsf:Ham_params,Sz2arr,initstate,Nsteps,dt):
     # saves data in a h5py dictionary
     directory='data/Sz2t/'
@@ -318,7 +321,7 @@ def save_data_twotimecorrelation(paramvals0:Ham_params,paramvalsf:Ham_params,cor
     directory='data/Twotimecorrelation/'
     if not os.path.exists(directory):
         os.makedirs(directory)
-    filename=directory+'Twotimecorrelator_Az_'+str(float(Az))+'_Ay_'+str(float(Ay))+'_t1_['+str(t1arr[0])+'_'+str((t1arr[-1]-t1arr[0])/(np.size(t1arr)-1))+'_'+str(t1arr[-1])+']_t2_['+str(t2arr[0])+'_'+str((t2arr[-1]-t2arr[0])/(np.size(t2arr)-1))+'_'+str(t2arr[-1])+']_from_'+paramvals0.paramstr()+'_to_'+paramvalsf.paramstr()+'.hdf5'
+    filename=directory+'Twotimecorrelator_Az_'+str(float(Az))+'_Ay_'+str(float(Ay))+'_t1_'+timearrstr(t1arr)+'_t2_'+timearrstr(t2arr)+'_from_'+paramvals0.paramstr()+'_to_'+paramvalsf.paramstr()+'.hdf5'
     print(filename)
     with h5py.File(filename, "w") as f:
         f.create_dataset("correlationarr", correlationarr.shape, dtype=correlationarr.dtype, data=correlationarr)
@@ -333,7 +336,7 @@ def save_data_EE(paramvals0:Ham_params,paramvalsf:Ham_params,entropyarr,tarr,ini
     directory='data/EE/'
     if not os.path.exists(directory):
         os.makedirs(directory)
-    filename=directory+'EE_SA_'+str(SA)+'t_['+str(tarr[0])+'_'+str((tarr[-1]-tarr[0])/(np.size(tarr)-1))+'_'+str(tarr[-1])+']_from_'+paramvals0.paramstr()+'_to_'+paramvalsf.paramstr()+'.hdf5'
+    filename=directory+'EE_SA_'+str(SA)+'t_'+timearrstr(tarr)+'_from_'+paramvals0.paramstr()+'_to_'+paramvalsf.paramstr()+'.hdf5'
     print(filename)
     with h5py.File(filename, "w") as f:
         f.create_dataset("entropyarr", entropyarr.shape, dtype=entropyarr.dtype, data=entropyarr)
