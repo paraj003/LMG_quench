@@ -331,17 +331,18 @@ def save_data_twotimecorrelation(paramvals0:Ham_params,paramvalsf:Ham_params,cor
     with open("list_of_twotimecorrelators.txt", "a") as myfile:
         myfile.write(filename+ "\n")
 
-def save_data_EE(paramvals0:Ham_params,paramvalsf:Ham_params,entropyarr,tarr,initstate,part_szarr):
+def save_data_EE(paramvals0:Ham_params,paramvalsf:Ham_params,entropyarr,tarr,initstate,La_arr):
     # saves data in a h5py dictionary
     directory='data/EE/'
     if not os.path.exists(directory):
         os.makedirs(directory)
-    filename=directory+'EE_LA_'+arrtostr(part_szarr)+'_t_'+arrtostr(tarr)+'_from_'+paramvals0.paramstr()+'_to_'+paramvalsf.paramstr()+'.hdf5'
+    filename=directory+'EE_LA_['+str(La_arr[0])+'_'+str(La_arr[-1])+']_t_'+arrtostr(tarr)+'_from_'+paramvals0.paramstr()+'_to_'+paramvalsf.paramstr()+'.hdf5'
     print(filename)
     with h5py.File(filename, "w") as f:
         f.create_dataset("entropyarr", entropyarr.shape, dtype=entropyarr.dtype, data=entropyarr)
         f.create_dataset("tarr", tarr.shape, dtype=tarr.dtype, data=tarr)
         f.create_dataset("InitState", initstate.shape, dtype=initstate.dtype, data=initstate)
+        f.create_dataset("La_arr", La_arr.shape, dtype=La_arr.dtype, data=La_arr)
         f.close()
     with open("list_of_entropy.txt", "a") as myfile:
         myfile.write(filename+ "\n")
