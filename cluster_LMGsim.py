@@ -11,8 +11,8 @@ if not os.path.exists(filename1) or not os.path.exists(filename2):
     print("Obtained Initial state.")
     #quench hamiltonian
     Hamf=LMG.LMG_generateHam(paramvalsf)
-    energyf,vecf=LA.eig(Hamf)
-    #U_dt=LA.expm(-1j*Hamf*dt)
+    #energyf,vecf=LA.eig(Hamf)
+    U_dt=LA.expm(-1j*Hamf*dt)
     #time-evolved magnetization squared
     Sz2arr=np.zeros(Nsteps)
     Sy2arr=np.zeros(Nsteps)

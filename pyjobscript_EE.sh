@@ -28,8 +28,8 @@ import mod_LMG_v1 as LMG
 import h5py
 
 ΔL=10
-L=2000#np.concatenate([np.arange(100,1000,100),np.arange(1000,2000,1000)])#choose even
-part_szarr=np.concatenate([np.linspace(10,100,10)]),np.linspace(200,1000,9)],axis=0)#np.arange(ΔL,int(L/2)+ΔL,ΔL)
+L=200#np.concatenate([np.arange(100,1000,100),np.arange(1000,2000,1000)])#choose even
+part_szarr=np.concatenate([np.linspace(10,100,10)])#,np.linspace(200,1000,9)],axis=0)#np.arange(ΔL,int(L/2)+ΔL,ΔL)
 dt=1.
 tarr=np.linspace(1,50,int((50-1)/dt)+1)#np.arange(1,50+dt,dt)
 Stot=L/2
@@ -38,7 +38,7 @@ paramvalsf=LMG.Ham_params(N=L,S=Stot,J=1.,γz=1.0,γy=0.0,Γ=1.)
 ">>LMG-params-EE-$SLURM_JOB_ID.py
 
 
-cat LMG-params-$SLURM_JOB_ID.py cluster_EE_LMGsim.py > temp-cluster_EE_LMGsim-$SLURM_JOB_ID.py
+cat LMG-params-EE-$SLURM_JOB_ID.py cluster_EE_LMGsim.py > temp-cluster_EE_LMGsim-$SLURM_JOB_ID.py
 
 
 python3 temp-cluster_EE_LMGsim-$SLURM_JOB_ID.py
