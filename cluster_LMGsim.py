@@ -23,5 +23,5 @@ if not os.path.exists(filename1) or not os.path.exists(filename2):
     LMG.save_data_Sϕ2t(paramvals0,paramvalsf,Sy2arr,0.,1.,InitState,Nsteps,dt)
     print("Sy^2 calculated")
 else:
-    print("Simulation unnecessary. File:"+filename)
+    print("Simulation unnecessary. File:"+filename1+"\n"+filename2)
 

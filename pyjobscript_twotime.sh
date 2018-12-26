@@ -8,7 +8,7 @@
 #SBATCH --mail-type=END
 #SBATCH --mem-per-cpu=6999
 ##SBATCH --exclusive
-#SBATCH --array=1-1
+#SBATCH --array=1-14
 . ~/.profile
 export MKL_NUM_THREADS=$SLURM_NTASKS
 export FFTW_NUM_THREADS=$SLURM_NTASKS
