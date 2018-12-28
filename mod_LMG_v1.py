@@ -265,7 +265,7 @@ def finitetemp_twotimecorrelation(X:Ham_params,t1arr,t2arr,β:float,Az:complex,A
         for p in range(np.size(energies)):
             correlationvals[:,:,p]=twotimecorrelation(paramvalsS,t1arr,t2arr,eigenvecs[:,p],energies,eigenvecs,Az,Ay)
             probvals[p]=np.exp(-β*shiftedenergies[p])
-        partitionfunctionarr[int(s)]=np.sum(probvals)
+            partitionfunctionarr[int(s)]=np.sum(probvals)
         for t1,q in zip(t1arr,range(np.size(t1arr))):
             for t2,r in zip(t2arr,range(np.size(t2arr))):
                 expectvalSarr[q,r,int(s)]=np.dot(probvals,correlationvals[q,r,:])
