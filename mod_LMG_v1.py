@@ -227,9 +227,9 @@ def twotimecorrelation(X:Ham_params,t1arr,t2arr,state,energies,eigenvecs,Az:comp
         U_t1=LMG_Ut(t1,energies,eigenvecs)
         Sϕt1=Sϕt_on_state(X,state,U_t1,Az,Ay)
 	for t2,r in zip(t2arr,range(np.size(t2arr))):
-                U_t2=LMG_Ut(t2,energies,eigenvecs)
-                Sϕt2=Sϕt_on_state(X,state,U_t2,Az,Ay)
-                correlationarr[q,r]=np.dot(np.transpose(np.conjugate(Sϕt2)),Sϕt1)
+            U_t2=LMG_Ut(t2,energies,eigenvecs)
+            Sϕt2=Sϕt_on_state(X,state,U_t2,Az,Ay)
+            correlationarr[q,r]=np.dot(np.transpose(np.conjugate(Sϕt2)),Sϕt1)
     return correlationarr
 
 def twotimecommutator(X:Ham_params,t1:float,t2:float,state,energies,eigenvecs,Az:complex,Ay:complex):
