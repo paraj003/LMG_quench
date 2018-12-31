@@ -27,6 +27,10 @@ class Ham_params:
         #returns a string that contains the parameters of the Hamiltonian
         return'L_'+str(int(self.N))+',S_'+str(float(self.S))+',J_'+str(float(self.J))+',Γ_'+str(float(self.Γ))+',γz_'+str(float(self.γz))+',γy_'+str(float(self.γy))
 
+    def paramstrwithoutLS(self):
+        #returns a string that contains the parameters of the Hamiltonian
+        return'J_'+str(float(self.J))+',Γ_'+str(float(self.Γ))+',γz_'+str(float(self.γz))+',γy_'+str(float(self.γy))
+
 
 ##function definitions
 def LMG_matrixelement(X:Ham_params,M:float,Mprime:float):
