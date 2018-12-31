@@ -27,7 +27,7 @@ import os
 import mod_LMG_v1 as LMG
 import h5py
 
-Larr=np.concatenate([np.linspace(100,1000,10),np.linspace(2000,5000,4)],axis=0)
+Larr=np.concatenate([np.linspace(100,1000,10),np.linspace(2000,9000,8)],axis=0)
 L=Larr[int(os.environ[\"SLURM_ARRAY_TASK_ID\"])-1]  #Set system size.
 paramvals0=LMG.Ham_params(N=L,S=L/2,J=1.,γz=1.,γy=0.,Γ=1.)
 paramvalsf=LMG.Ham_params(N=L,S=L/2,J=1.,γz=0.0,γy=1.0,Γ=1.)

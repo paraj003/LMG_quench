@@ -1,4 +1,4 @@
-directory1='data/Sϕ2t/'
+directory1='data/Twotimecorrelation/'
 
 filename1=directory1+'Twotimecorrelator_Az_'+str(1.)+'_Ay_'+str(0.)+'_t1_['+str(t1arr[0])+'_'+str((t1arr[-1]-t1arr[0])/np.size(t1arr))+'_'+str(t1arr[-1])+']_t2_['+str(t2arr[0])+'_'+str((t2arr[-1]-t2arr[0])/np.size(t2arr))+'_'+str(t2arr[-1])+']_from_'+paramvals0.paramstr()+'_to_'+paramvalsf.paramstr()+'.hdf5'
 filename2=directory1+'Twotimecorrelator_Az_'+str(0.)+'_Ay_'+str(1.)+'_t1_['+str(t1arr[0])+'_'+str((t1arr[-1]-t1arr[0])/np.size(t1arr))+'_'+str(t1arr[-1])+']_t2_['+str(t2arr[0])+'_'+str((t2arr[-1]-t2arr[0])/np.size(t2arr))+'_'+str(t2arr[-1])+']_from_'+paramvals0.paramstr()+'_to_'+paramvalsf.paramstr()+'.hdf5'
