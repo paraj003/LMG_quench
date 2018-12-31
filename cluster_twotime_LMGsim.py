@@ -1,7 +1,7 @@
 directory1='data/Twotimecorrelation/'
 
-filename1=directory1+'Twotimecorrelator_Az_'+str(1.)+'_Ay_'+str(0.)+'_t1_'+arrtostr(t1arr)+'_t2_'+arrtostr(t2arr)+'_from_'+paramvals0.paramstr()+'_to_'+paramvalsf.paramstr()+'.hdf5'
-filename2=directory1+'Twotimecorrelator_Az_'+str(0.)+'_Ay_'+str(1.)+'_t1_'+arrtostr(t1arr)+'_t2_'+arrtostr(t2arr)+'_from_'+paramvals0.paramstr()+'_to_'+paramvalsf.paramstr()+'.hdf5'
+filename1=directory1+'Twotimecorrelator_Az_'+str(1.)+'_Ay_'+str(0.)+'_t1_'+LMG.arrtostr(t1arr)+'_t2_'+LMG.arrtostr(t2arr)+'_from_'+paramvals0.paramstr()+'_to_'+paramvalsf.paramstr()+'.hdf5'
+filename2=directory1+'Twotimecorrelator_Az_'+str(0.)+'_Ay_'+str(1.)+'_t1_'+LMG.arrtostr(t1arr)+'_t2_'+LMG.arrtostr(t2arr)+'_from_'+paramvals0.paramstr()+'_to_'+paramvalsf.paramstr()+'.hdf5'
 
 if os.path.exists(filename1) and os.path.exists(filename2):
     print("Simulation unnecessary. File:\n"+filename1+"\n"+filename2)
