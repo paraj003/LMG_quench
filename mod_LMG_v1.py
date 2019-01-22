@@ -113,38 +113,6 @@ def time_evolved_Sϕ2_exact(InitState,tarr,energies,eigenvecs,X:Ham_params,Az:co
     for t1,q in zip(tarr,range(np.size(tarr))):
         Sϕ2arr[q]=np.real(twotimecorrelation(X,[t1],[t1],InitState,energies,eigenvecs,Az,Ay)[0,0])
     return Sϕ2arr
-
-def Finitetempmagnetizationϕ2(X:Ham_params,β,Az:complex,Ay:complex):
-    Sarr=np.arange(0,X.N/2+1)
-    ##print(Sarr)
-    expectvalarr=np.zeros(np.shape(Sarr))
-    partitionfunctionarr=np.zeros(np.shape(Sarr))
-    minenergies=np.zeros(np.shape(Sarr))
-    for s in Sarr:
-        ##print(s)
-        paramvalsS=Ham_params(N=X.N,S=s,J=X.J,γz=X.γz,γy=X.γy,Γ=X.Γ)
-        Ham=LMG_generateHam(paramvalsS)
-        energies,eigenvecs=LA.eig(Ham)
-        ##minenergies[int(s)]=np.min(np.real(energies))
-        Mvals=np.zeros(np.shape(energies))
-        probvals=np.zeros(np.shape(energies))
-        shiftedenergies=np.real(energies)-minenergies[int(s)] #(to shift the zero of the energies)
-        for p in range(np.size(energies)):
-            Mvals[p]=magnetizationϕ2(eigenvecs[:,p],paramvalsS,Az,Ay)
-            probvals[p]=np.exp(-β*shiftedenergies[p])
-        partitionfunctionarr[int(s)]=np.sum(probvals)
-        expectvalarr[int(s)]=np.dot(probvals,Mvals)
-    Ds=np.zeros(np.shape(Sarr))#multiplicities of each spin sector
-    Ds[int(X.N/2)]=1
-    for p in range(int(X.N/2)):
-        Ds[p]=bm(X.N,int(X.N/2)-p)-bm(X.N,int(X.N/2)-p-1)
-    ##print(Ds)
-    minenergiesshifted=minenergies-np.min(minenergies)
-    ##print(np.exp(-β*minenergiesshifted)*Ds)
-    expectvalshifted=np.dot((np.exp(-β*minenergiesshifted)*Ds),expectvalarr)
-    partitionfunctionshifted=np.dot((np.exp(-β*minenergiesshifted)*Ds),partitionfunctionarr)
-    expectval=expectvalshifted/partitionfunctionshifted
-    return expectval
 ###########ENTANGLEMENT ENTROPY##########################
 def CGmatrix(SA,SB,S,directory):
     ##Define a ClebschGordan matrix using sympy library, returns [(2SA+1)(2SB+1)]X[(2S+1)]  matrix that changes for |S,M> basis to |SA,MA;SB,MB>
@@ -249,6 +217,49 @@ def twotimecommutator(X:Ham_params,t1:float,t2:float,state,energies,eigenvecs,Az
     commutatorarr[1]=np.dot(np.transpose(np.conjugate(Sϕt2)),Sϕt1)+np.dot(np.transpose(np.conjugate(Sϕt1)),Sϕt2)
     return commutatorarr
 
+##############FINITE TEMPERATURE FUNCTIONS#################
+###########Only done for γy=0, OR  γz=0.
+def finitetemp_criticalβ(X:Ham_params):
+    if X.γy==0:
+        return 1/(2*X.Γ)*(np.log((X.J*X.γz+X.Γ)/(X.J*X.γz-X.Γ)))
+    elif X.γz==0:
+        return 1/(2*X.Γ)*(np.log((X.J*X.γy+X.Γ)/(X.J*X.γy-X.Γ)))
+    else:
+        print("Can't calculate critical field in this parameter regime. Set either one of γy or γz to zero.")
+        return
+
+def Finitetempmagnetizationϕ2(X:Ham_params,β,Az:complex,Ay:complex):
+    Sarr=np.arange(0,X.N/2+1)
+    ##print(Sarr)
+    expectvalarr=np.zeros(np.shape(Sarr))
+    partitionfunctionarr=np.zeros(np.shape(Sarr))
+    minenergies=np.zeros(np.shape(Sarr))
+    for s in Sarr:
+        ##print(s)
+        paramvalsS=Ham_params(N=X.N,S=s,J=X.J,γz=X.γz,γy=X.γy,Γ=X.Γ)
+        Ham=LMG_generateHam(paramvalsS)
+        energies,eigenvecs=LA.eig(Ham)
+        minenergies[int(s)]=np.min(np.real(energies))
+        Mvals=np.zeros(np.shape(energies))
+        probvals=np.zeros(np.shape(energies))
+        shiftedenergies=np.real(energies)-minenergies[int(s)] #(to shift the zero of the energies)
+        for p in range(np.size(energies)):
+            Mvals[p]=magnetizationϕ2(eigenvecs[:,p],paramvalsS,Az,Ay)
+            #print(shiftedenergies)
+            probvals[p]=np.exp(-β*shiftedenergies[p])
+        partitionfunctionarr[int(s)]=np.sum(probvals)
+        expectvalarr[int(s)]=np.dot(probvals,Mvals)
+    Ds=np.zeros(np.shape(Sarr))#multiplicities of each spin sector
+    Ds[int(X.N/2)]=1
+    for p in range(int(X.N/2)):
+        Ds[p]=bm(X.N,int(X.N/2)-p)-bm(X.N,int(X.N/2)-p-1)
+    ##print(Ds)
+    minenergiesshifted=minenergies-np.min(minenergies)
+    ##print(np.exp(-β*minenergiesshifted)*Ds)
+    expectvalshifted=np.dot((np.exp(-β*minenergiesshifted)*Ds),expectvalarr)
+    partitionfunctionshifted=np.dot((np.exp(-β*minenergiesshifted)*Ds),partitionfunctionarr)
+    expectval=expectvalshifted/partitionfunctionshifted
+    return expectval
 
 def finitetemp_twotimecorrelation(X:Ham_params,t1arr,t2arr,β:float,Az:complex,Ay:complex):
     ##obtain the finitetemperature correlator <Sϕ(t2)Sϕ(t1)>_β
@@ -262,7 +273,7 @@ def finitetemp_twotimecorrelation(X:Ham_params,t1arr,t2arr,β:float,Az:complex,A
         paramvalsS=Ham_params(N=X.N,S=s,J=X.J,γz=X.γz,γy=X.γy,Γ=X.Γ)
         Ham=LMG_generateHam(paramvalsS)
         energies,eigenvecs=LA.eig(Ham)
-        ##minenergies[int(s)]=np.min(np.real(energies))
+        minenergies[int(s)]=np.min(np.real(energies))
         correlationvals=np.zeros((np.size(t1arr),np.size(t2arr),np.size(energies)),dtype=complex)
         probvals=np.zeros(np.shape(energies))
         shiftedenergies=np.real(energies)-minenergies[int(s)] #(to shift the zero of the energies)
