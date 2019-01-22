@@ -347,6 +347,23 @@ def save_data_twotimecorrelation(paramvals0:Ham_params,paramvalsf:Ham_params,cor
     with open("list_of_twotimecorrelators.txt", "a") as myfile:
         myfile.write(filename+ "\n")
 
+def save_data_finitetemp_twotimecorrelation(β,paramvals:Ham_params,correlationarr,t1arr,t2arr,Az,Ay):
+    ## saves data in a h5py dictionary
+    directory='data/FiniteTempTwotimecorrelation/'
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    filename=directory+'FiniteTempTwotimecorrelator_β_'+str(β)+'_Az_'+str(float(Az))+'_Ay_'+str(float(Ay))+'_t1_'+arrtostr(t1arr)+'_t2_'+arrtostr(t2arr)+'_from_'+paramvals.paramstr()+'.hdf5'
+    print(filename)
+    with h5py.File(filename, "w") as f:
+        f.create_dataset("correlationarr", correlationarr.shape, dtype=correlationarr.dtype, data=correlationarr)
+        f.create_dataset("t1arr", t1arr.shape, dtype=t1arr.dtype, data=t1arr)
+        f.create_dataset("t2arr", t2arr.shape, dtype=t2arr.dtype, data=t2arr)
+        f.create_dataset("β", β.shape, dtype=β.dtype, data=β)
+        f.close()
+    with open("list_of_finitetemptwotimecorrelators.txt", "a") as myfile:
+        myfile.write(filename+ "\n")
+
+
 def save_data_EE(paramvals0:Ham_params,paramvalsf:Ham_params,entropyarr,tarr,initstate,La_arr):
     ## saves data in a h5py dictionary
     directory='data/EE/'
