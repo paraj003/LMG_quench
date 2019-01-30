@@ -8,7 +8,7 @@
 #SBATCH --mail-type=END
 #SBATCH --mem-per-cpu=6999
 ##SBATCH --exclusive
-#SBATCH --array=1-14
+#SBATCH --array=1-1
 . ~/.profile
 export MKL_NUM_THREADS=$SLURM_NTASKS
 export FFTW_NUM_THREADS=$SLURM_NTASKS
@@ -27,13 +27,15 @@ import os
 import mod_LMG_v1 as LMG
 import h5py
 
-Larr=np.concatenate([np.linspace(100,1000,10),np.linspace(2000,9000,8)],axis=0)
+Larr=[20]#np.concatenate([np.linspace(100,1000,10),np.linspace(2000,9000,8)],axis=0)
 L=Larr[int(os.environ[\"SLURM_ARRAY_TASK_ID\"])-1]  #Set system size.
-paramvals0=LMG.Ham_params(N=L,S=L/2,J=1.,γz=1.,γy=0.,Γ=1.)
-paramvalsf=LMG.Ham_params(N=L,S=L/2,J=1.,γz=1.0,γy=0.0,Γ=1.)
+paramvals=LMG.Ham_params(N=L,S=L/2,J=1.,γz=1.,γy=0.,Γ=0.7)
+β=LMG.finitetemp_criticalβ(paramvals)
 dt=1. #time step
 t1arr=np.array([20.])
 t2arr=np.linspace(10,50,int((50-10)/dt)+1)
+Az=1.
+Ay=0.
 ">>LMG-params-$SLURM_JOB_ID.py
 
 
